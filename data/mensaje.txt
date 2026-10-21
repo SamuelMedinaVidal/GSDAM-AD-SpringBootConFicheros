@@ -1,1 +1,2 @@
-Hola desde un fichero
+Primera linea
+Segunda linea

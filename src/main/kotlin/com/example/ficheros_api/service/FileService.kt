@@ -7,14 +7,42 @@ import java.nio.file.Path
 @Service
 class FileService {
 
-    private val file: Path = Path.of("data", "mensaje.txt")
+    private val folder: Path = Path.of("data")
 
-    fun writeMessage() {
-        Files.createDirectories(file.parent)
-        Files.writeString(file, "Hola desde un fichero")
+    init {
+        Files.createDirectories(folder)
     }
 
-    fun readMessage(): String {
-        return Files.readString(file)
+    private fun resolveName(nombre: String): Path {
+        require(nombre.isNotBlank() && nombre != "." && nombre != "..") {
+            "El nombre del fichero no es válido"
+        }
+        require(nombre.none { it in "/\\:" }) {
+            "Introduce solo un nombre, sin carpetas"
+        }
+        return folder.resolve(nombre)
+    }
+
+    // Mantiene la operación inicial, que escribía un mensaje fijo.
+    fun writeMessage() {
+        Files.writeString(folder.resolve("mensaje.txt"), "Hola desde un fichero")
+    }
+
+    fun writeMessage(nombre: String, contenido: String) {
+        Files.writeString(resolveName(nombre), contenido)
+    }
+
+    fun readMessage(nombre: String): String {
+        return Files.readString(resolveName(nombre))
+    }
+
+    fun list(): List<String> {
+        return Files.list(folder).use { paths ->
+            paths
+                .filter { Files.isRegularFile(it) }
+                .map { it.fileName.toString() }
+                .sorted()
+                .toList()
+        }
     }
 }
