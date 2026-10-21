@@ -3,6 +3,8 @@ package com.example.ficheros_api.service
 import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Path
+import org.springframework.web.multipart.MultipartFile
+import java.nio.file.StandardCopyOption
 
 @Service
 class FileService {
@@ -44,5 +46,22 @@ class FileService {
                 .sorted()
                 .toList()
         }
+    }
+
+    fun save(file: MultipartFile): String {
+        require(!file.isEmpty) { "El fichero está vacío" }
+
+        val name = file.originalFilename ?: ""
+        val destination = resolveName(name)
+
+        file.inputStream.use { input ->
+            Files.copy(
+                input,
+                destination,
+                StandardCopyOption.REPLACE_EXISTING
+            )
+        }
+
+        return "Fichero guardado: $name"
     }
 }
