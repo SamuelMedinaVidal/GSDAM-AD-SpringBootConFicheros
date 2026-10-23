@@ -1,0 +1,2 @@
+Repasar lectura de ficheros.
+Practicar peticiones HTTP.
